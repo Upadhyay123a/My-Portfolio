@@ -122,9 +122,8 @@
     /* LAYOUT / SECTIONS */
     section{
         min-height:100vh;
-        /* reduced top/bottom padding so sections sit closer */
-        padding-block: clamp(28px, 4.5vh, 42px);
-        padding-inline: clamp(10px, 1.5vw, 20px);
+        padding-block: clamp(3px, 2vh, 20px); /* accommodates fixed nav */
+        padding-inline: clamp(6px, 1vw, 10px);
         display:flex;
         align-items:center;
         justify-content:center;
@@ -181,18 +180,18 @@
     /* CONTENT CARDS */
     .content-section{
         background: var(--card-bg);
-        margin: clamp(10px,1.1rem,24px) 0; /* smaller vertical gap between blocks */
-        padding: clamp(14px,2.2vw,32px); /* slightly tighter padding */
-        border-radius:14px;
-        box-shadow:0 12px 28px rgba(0,0,0,.06);
+        margin: clamp(20px,4vh,60px) 0;
+        padding: clamp(20px,3.5vw,60px);
+        border-radius:16px;
+        box-shadow:0 18px 40px rgba(0,0,0,.08);
         transition:transform .22s ease,box-shadow .22s ease;
     }
     .content-section:hover{ transform:translateY(-8px); box-shadow:0 28px 60px rgba(0,0,0,.12) }
 
     .section-title{
-        font-size: clamp(1.2rem, 2.2vw, 2rem);
+        font-size: clamp(1.4rem, 2.8vw, 2.5rem);
         text-align:center;
-        margin-bottom: clamp(0.9rem,1.8vw,1.6rem);
+        margin-bottom: clamp(1.5rem,3.2vw,3rem);
         color:var(--text);
         position:relative;
     }
@@ -450,7 +449,7 @@
         .hero-content h1{ font-size:clamp(1.6rem,8vw,2.4rem) }
         .hero-content .description{ font-size:.98rem; padding-inline:6px }
         .btn{ padding: .55rem .9rem; font-size:.9rem }
-        .content-section{ padding:12px; margin:8px 0 }
+        .content-section{ padding:18px; border-radius:12px }
         .project-header{ padding:12px }
         .project-content{ padding:12px }
         .timeline-content{ padding:12px; font-size:.95rem }
@@ -488,58 +487,6 @@
     nav.menu-open #nav-close{ display:block; color:#fff; background: rgba(0,0,0,0.28) }
     /* ensure the built-in nav-toggle is hidden behind overlay or reduced opacity */
     nav.menu-open #nav-toggle{ opacity:0.9; z-index:1240 }
-}
-
-/* Reduce vertical spacing between sections and tighten section internals */
-section{
-    min-height:100vh;
-    /* reduced top/bottom padding so sections sit closer */
-    padding-block: clamp(48px, 6.5vh, 72px);
-    padding-inline: clamp(12px, 3.5vw, 40px);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-/* make content cards more compact and reduce gaps between them */
-.content-section{
-    background: var(--card-bg);
-    margin: clamp(10px,2vh,24px) 0; /* smaller vertical gap between blocks */
-    padding: clamp(14px,2.2vw,32px); /* slightly tighter padding */
-    border-radius:14px;
-    box-shadow:0 12px 28px rgba(0,0,0,.06);
-    transition:transform .22s ease,box-shadow .22s ease;
-}
-
-/* tighten section title spacing */
-.section-title{
-    font-size: clamp(1.2rem, 2.2vw, 2rem);
-    text-align:center;
-    margin-bottom: clamp(0.9rem,1.8vw,1.6rem);
-    color:var(--text);
-    position:relative;
-}
-
-/* reduce grid top margins so lists sit closer to titles */
-.skills-grid,
-.projects-grid,
-.contact-grid{
-    margin-top: .75rem;
-}
-
-/* hero description and CTA: smaller bottom gap so next block moves up */
-.hero-content .description{ margin-bottom: .9rem; }
-.cta-buttons{ margin-bottom: .4rem; }
-
-/* timeline - reduce its top spacing */
-.timeline{ margin-top: .9rem; }
-
-/* small tweak for very small screens */
-@media (max-width:480px){
-    section{ padding-block: clamp(40px, 8vh, 60px) }
-    .content-section{ padding:12px; margin:8px 0 }
-    .section-title{ margin-bottom: .8rem }
-    .hero-content .description{ margin-bottom:.7rem }
 }
 </style>
 </head>
