@@ -342,12 +342,12 @@
     /* RESPONSIVE TWEAKS */
     @media (max-width:1024px){
         .timeline-item{ width:70% }
-        nav{ padding-inline:16px }
+        nav{ padding-inline:16px; justify-content: flex-end }
 
         /* show toggle */
         #nav-toggle{ display:flex }
 
-        /* horizontal dropdown centered under navbar */
+        /* closed (default) small horizontal dropdown (keeps header compact) */
         nav ul{
             display:none;
             position:absolute;
@@ -368,28 +368,61 @@
             -webkit-overflow-scrolling: touch;
             white-space:nowrap;
         }
-
         nav ul li{ display:inline-block; }
 
-        /* when nav has menu-open class, show the menu */
+        /* when menu-open, replace dropdown with full-screen vertical overlay */
         nav.menu-open ul{
-            display:flex;
-            flex-wrap:nowrap;
+            display:flex !important;
+            position:fixed;
+            inset:0;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            transform:none;
+            flex-direction:column;
+            gap: 1.25rem;
+            /* changed overlay color -> gradient matching site accents */
+            background: linear-gradient(180deg, rgba(102,126,234,0.96), rgba(240,115,171,0.96));
+            color: #fff;
+            padding: calc(var(--nav-height) + 20px) 20px 40px;
+            border-radius:0;
+            box-shadow:none;
+            min-width:100%;
+            max-width:100%;
             justify-content:center;
+            align-items:center;
+            z-index:1200;
+            overflow:auto;
+            -webkit-overflow-scrolling: touch;
+            white-space:normal;
+            height:100vh;
         }
 
-        /* style links inside the horizontal dropdown */
+        /* stack items vertically and make each full width on the overlay */
+        nav.menu-open ul li{
+            display:block;
+            width:100%;
+            max-width:780px;
+        }
+
+        /* bigger, centered, tappable links for overlay */
         nav.menu-open a{
-            color:#333;
-            padding:.5rem .9rem;
-            border-radius:8px;
-            display:inline-block;
-            font-weight:600;
-            white-space:nowrap;
+            color: #fff;
+            padding: 1rem 1.4rem;
+            border-radius:12px;
+            display:block;
+            font-weight:700;
+            font-size: clamp(1.05rem, 2.8vw, 1.35rem);
+            background: transparent;
+            white-space:normal;
+            text-align:center;
+            width:100%;
+            box-sizing:border-box;
         }
-        nav.menu-open a:hover{ background: rgba(0,0,0,0.04) }
+        nav.menu-open a:hover{ background: rgba(255,255,255,0.04) }
 
-        /* keep nav aligned to right to show toggle */
+        /* keep toggle visible in top-right when overlay closed */
         nav{ justify-content: flex-end; padding-inline:16px }
     }
 
@@ -427,6 +460,36 @@
 
     /* final safe defaults */
     img,svg,video{ max-width:100%; height:auto; display:block }
+
+    /* CLOSE (X) BUTTON */
+#nav-close{
+    display:none; /* only shown with menu-open on small screens */
+    position:fixed;
+    top:18px;
+    right:18px;
+    width:44px;
+    height:44px;
+    padding:0;
+    border:0;
+    border-radius:8px;
+    background: rgba(255,255,255,0.06);
+    color:#fff;
+    font-size:1.4rem;
+    line-height:44px;
+    text-align:center;
+    cursor:pointer;
+    z-index:1250; /* above overlay */
+    backdrop-filter: blur(6px);
+    transition:background .18s ease, transform .12s ease;
+}
+#nav-close:hover{ background: rgba(255,255,255,0.12); transform:scale(1.03) }
+
+/* show close button when overlay is open on <=1024px */
+@media (max-width:1024px){
+    nav.menu-open #nav-close{ display:block; color:#fff; background: rgba(0,0,0,0.28) }
+    /* ensure the built-in nav-toggle is hidden behind overlay or reduced opacity */
+    nav.menu-open #nav-toggle{ opacity:0.9; z-index:1240 }
+}
 </style>
 </head>
 <body>
@@ -437,9 +500,12 @@
     <!-- Navigation -->
     <nav id="navbar">
         <!-- added hamburger toggle (keeps existing <ul> unchanged) -->
-        <button id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav" aria-haspopup="true" style="background-color: #22cc38;">
+        <button id="nav-toggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav" aria-haspopup="true" style="background-color: #f01ebb;">
             <span class="bar"></span>
         </button>
+
+        <!-- close button shown when overlay is open -->
+        <button id="nav-close" aria-label="Close menu" title="Close menu">✕</button>
 
         <ul id="main-nav">
             <li><a href="#hero">Home</a></li>
@@ -846,37 +912,97 @@
         fadeElements.forEach(el => fadeInObserver.observe(el));
 
         // Responsive hamburger toggle (appears for widths <= 1024px)
+        // - opens horizontal dropdown by default but when opened becomes full-screen overlay
         (function(){
             const NAV_BREAKPOINT = 1024;
+            const navbar = document.getElementById('navbar');
             const navToggle = document.getElementById('nav-toggle');
+            const navClose = document.getElementById('nav-close');
             const navList = document.getElementById('main-nav');
 
             if (!navToggle || !navList || !navbar) return;
 
+            function setBodyScrollLocked(lock){
+                document.documentElement.style.overflow = lock ? 'hidden' : '';
+                document.body.style.overflow = lock ? 'hidden' : '';
+            }
+
+            function openMenu(){
+                navbar.classList.add('menu-open');
+                navToggle.classList.add('open');
+                navToggle.setAttribute('aria-expanded', 'true');
+                setBodyScrollLocked(true);
+            }
+            function closeMenu(){
+                navbar.classList.remove('menu-open');
+                navToggle.classList.remove('open');
+                navToggle.setAttribute('aria-expanded', 'false');
+                setBodyScrollLocked(false);
+            }
+
             navToggle.addEventListener('click', () => {
-                const opened = navbar.classList.toggle('menu-open');
-                navToggle.classList.toggle('open', opened);
-                navToggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+                if (navbar.classList.contains('menu-open')) closeMenu();
+                else openMenu();
             });
+            navClose.addEventListener('click', closeMenu);
 
-            // Close the mobile menu after clicking a nav link (keeps smooth-scroll behavior)
+            // Ensure overlay closes before the global smooth-scroll handler runs.
+            // Use a capture listener so it executes in the capture phase (before bubble-phase smooth-scroll handler).
             document.querySelectorAll('#navbar a[href^="#"]').forEach(link => {
-                link.addEventListener('click', () => {
+                link.addEventListener('click', (e) => {
                     if (window.innerWidth <= NAV_BREAKPOINT && navbar.classList.contains('menu-open')) {
-                        navbar.classList.remove('menu-open');
-                        navToggle.classList.remove('open');
-                        navToggle.setAttribute('aria-expanded', 'false');
+                        // Close overlay immediately so page scrolling (global handler) can work.
+                        closeMenu();
+                        // Allow event to continue to the existing smooth-scroll handler (no preventDefault here).
                     }
-                });
+                }, true); // capture = true
             });
 
-            // Close menu on resize if resized above breakpoint
+            // Close menu on resize if resized above breakpoint or unlock body scroll when closed
             window.addEventListener('resize', () => {
                 if (window.innerWidth > NAV_BREAKPOINT && navbar.classList.contains('menu-open')) {
-                    navbar.classList.remove('menu-open');
-                    navToggle.classList.remove('open');
-                    navToggle.setAttribute('aria-expanded', 'false');
+                    closeMenu();
                 }
+            });
+
+            // Close overlay when user presses Escape or clicks outside the menu area
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navbar.classList.contains('menu-open')) closeMenu();
+            });
+
+            // optional: close overlay when tapping the overlay background (but keep clicks on links working)
+            document.addEventListener('click', (e) => {
+                if (!navbar.classList.contains('menu-open')) return;
+                const isInsideNav = e.target.closest('#navbar ul') || e.target.closest('#nav-toggle');
+                if (!isInsideNav) closeMenu();
+            });
+        })();
+
+        // Add close-button listener (place inside the existing hamburger IIFE or after it)
+        (function(){
+            const navClose = document.getElementById('nav-close');
+            const navToggle = document.getElementById('nav-toggle');
+            const navbar = document.getElementById('navbar');
+
+            if (!navClose || !navToggle || !navbar) return;
+
+            // Reuse existing closeMenu/openMenu funcs if present; otherwise implement simple close
+            function closeMenuLocal(){
+                navbar.classList.remove('menu-open');
+                navToggle.classList.remove('open');
+                navToggle.setAttribute('aria-expanded','false');
+                document.documentElement.style.overflow = '';
+                document.body.style.overflow = '';
+            }
+
+            navClose.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeMenuLocal();
+            });
+
+            // Also ensure Escape still closes (keeps existing behavior)
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navbar.classList.contains('menu-open')) closeMenuLocal();
             });
         })();
     </script>
