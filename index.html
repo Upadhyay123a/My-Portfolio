@@ -122,8 +122,9 @@
     /* LAYOUT / SECTIONS */
     section{
         min-height:100vh;
-        padding-block: clamp(84px, 12vh, 140px); /* accommodates fixed nav */
-        padding-inline: clamp(16px, 4vw, 50px);
+        /* reduced top/bottom padding so sections sit closer */
+        padding-block: clamp(28px, 4.5vh, 42px);
+        padding-inline: clamp(10px, 1.5vw, 20px);
         display:flex;
         align-items:center;
         justify-content:center;
@@ -180,18 +181,18 @@
     /* CONTENT CARDS */
     .content-section{
         background: var(--card-bg);
-        margin: clamp(20px,4vh,60px) 0;
-        padding: clamp(20px,3.5vw,60px);
-        border-radius:16px;
-        box-shadow:0 18px 40px rgba(0,0,0,.08);
+        margin: clamp(10px,1.1rem,24px) 0; /* smaller vertical gap between blocks */
+        padding: clamp(14px,2.2vw,32px); /* slightly tighter padding */
+        border-radius:14px;
+        box-shadow:0 12px 28px rgba(0,0,0,.06);
         transition:transform .22s ease,box-shadow .22s ease;
     }
     .content-section:hover{ transform:translateY(-8px); box-shadow:0 28px 60px rgba(0,0,0,.12) }
 
     .section-title{
-        font-size: clamp(1.4rem, 2.8vw, 2.5rem);
+        font-size: clamp(1.2rem, 2.2vw, 2rem);
         text-align:center;
-        margin-bottom: clamp(1.5rem,3.2vw,3rem);
+        margin-bottom: clamp(0.9rem,1.8vw,1.6rem);
         color:var(--text);
         position:relative;
     }
@@ -391,7 +392,7 @@
             overflow:auto;
             -webkit-overflow-scrolling: touch;
             white-space:normal;
-            height:60vh;
+            height:40vh;
         }
 
         /* stack items vertically and reduce extra margins */
@@ -449,7 +450,7 @@
         .hero-content h1{ font-size:clamp(1.6rem,8vw,2.4rem) }
         .hero-content .description{ font-size:.98rem; padding-inline:6px }
         .btn{ padding: .55rem .9rem; font-size:.9rem }
-        .content-section{ padding:18px; border-radius:12px }
+        .content-section{ padding:12px; margin:8px 0 }
         .project-header{ padding:12px }
         .project-content{ padding:12px }
         .timeline-content{ padding:12px; font-size:.95rem }
@@ -463,8 +464,8 @@
 #nav-close{
     display:none; /* only shown with menu-open on small screens */
     position:fixed;
-    top:18px;
-    right:18px;
+    top:7.5px;
+    right:16px;
     width:44px;
     height:44px;
     padding:0;
@@ -487,6 +488,58 @@
     nav.menu-open #nav-close{ display:block; color:#fff; background: rgba(0,0,0,0.28) }
     /* ensure the built-in nav-toggle is hidden behind overlay or reduced opacity */
     nav.menu-open #nav-toggle{ opacity:0.9; z-index:1240 }
+}
+
+/* Reduce vertical spacing between sections and tighten section internals */
+section{
+    min-height:100vh;
+    /* reduced top/bottom padding so sections sit closer */
+    padding-block: clamp(48px, 6.5vh, 72px);
+    padding-inline: clamp(12px, 3.5vw, 40px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+/* make content cards more compact and reduce gaps between them */
+.content-section{
+    background: var(--card-bg);
+    margin: clamp(10px,2vh,24px) 0; /* smaller vertical gap between blocks */
+    padding: clamp(14px,2.2vw,32px); /* slightly tighter padding */
+    border-radius:14px;
+    box-shadow:0 12px 28px rgba(0,0,0,.06);
+    transition:transform .22s ease,box-shadow .22s ease;
+}
+
+/* tighten section title spacing */
+.section-title{
+    font-size: clamp(1.2rem, 2.2vw, 2rem);
+    text-align:center;
+    margin-bottom: clamp(0.9rem,1.8vw,1.6rem);
+    color:var(--text);
+    position:relative;
+}
+
+/* reduce grid top margins so lists sit closer to titles */
+.skills-grid,
+.projects-grid,
+.contact-grid{
+    margin-top: .75rem;
+}
+
+/* hero description and CTA: smaller bottom gap so next block moves up */
+.hero-content .description{ margin-bottom: .9rem; }
+.cta-buttons{ margin-bottom: .4rem; }
+
+/* timeline - reduce its top spacing */
+.timeline{ margin-top: .9rem; }
+
+/* small tweak for very small screens */
+@media (max-width:480px){
+    section{ padding-block: clamp(40px, 8vh, 60px) }
+    .content-section{ padding:12px; margin:8px 0 }
+    .section-title{ margin-bottom: .8rem }
+    .hero-content .description{ margin-bottom:.7rem }
 }
 </style>
 </head>
@@ -522,8 +575,14 @@
                 <h1>Atul Kumar Upadhyay</h1>
                 <p class="subtitle">Full Stack Java Developer</p>
                 <p class="description">
-                    Passionate Computer Science student with expertise in Java, Spring Boot, and modern web technologies. 
-                    I build scalable applications and love solving complex problems through code.
+                   <!-- Passionate Computer Science student with expertise in Java, Spring Boot, and modern web technologies. 
+                    I build scalable applications and love solving complex problems through code.-->
+                    💻 I’m a Full Stack Java Developer with expertise in Java, Spring Boot, REST APIs, and scalable backend systems.
+                    I enjoy building high-performance applications that solve real-world problems and also bring working knowledge
+                    of HTML, CSS, and JavaScript for effective full-stack collaboration.
+
+                    I combine backend efficiency with user-friendly designto deliver impactful solutions, while continuously learning
+                    and growing as a developer. I’m passionate about technology, problem-solving, and creating systems that make a difference.
                 </p>
                 <div class="cta-buttons">
                     <a href="#projects" class="btn primary">View My Work</a>
