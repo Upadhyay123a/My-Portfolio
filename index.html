@@ -6,7 +6,15 @@
     <title>Atul Kumar Upadhyay - Full Stack Java Developer</title>
 <style>
     :root{
-        --bg-gradient: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #f5576c);
+        /* vertical animated gradient colors (top -> bottom) */
+        --bg-gradient: linear-gradient(180deg,
+            #667eea 0%,
+            #764ba2 20%,
+            #f093fb 40%,
+            #f5576c 60%,
+            #ffd86b 80%,
+            #4facfe 100%
+        );
         --accent-gradient: linear-gradient(45deg, #667eea, #764ba2);
         --card-bg: rgba(255,255,255,0.95);
         --glass: rgba(255,255,255,0.1);
@@ -25,18 +33,20 @@
         line-height:1.6;
         color:var(--text);
         overflow-x:hidden;
-        background:var(--bg-gradient);
-        background-size:400% 400%;
-        animation: gradientBG 15s ease infinite;
+        background: var(--bg-gradient);
+        background-attachment: fixed;   /* keep gradient fixed to viewport so it covers whole page */
+        background-size: 100% 200%;     /* taller than viewport to allow vertical movement */
+        animation: gradientBG 18s linear infinite;
         -webkit-font-smoothing:antialiased;
         -moz-osx-font-smoothing:grayscale;
         text-rendering:optimizeLegibility;
     }
 
+    /* move gradient vertically top -> bottom -> top */
     @keyframes gradientBG{
-        0%{background-position:0% 50%}
-        50%{background-position:100% 50%}
-        100%{background-position:0% 50%}
+        0%{ background-position: 50% 0% }
+        50%{ background-position: 50% 100% }
+        100%{ background-position: 50% 0% }
     }
 
     /* NAVIGATION */
