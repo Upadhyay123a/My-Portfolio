@@ -542,6 +542,34 @@ nav a.active{
 /* subtle tilt state for project cards */
 .project-card.tilt{ transition:transform .12s ease, box-shadow .12s ease; will-change:transform }
 .project-card.tilt:hover{ box-shadow:0 30px 60px rgba(0,0,0,0.12) }
+
+/* clock styling (add near end of <style>) */
+#clock{
+    color: #fff;
+    font-weight:700;
+    font-size: .95rem;
+    padding: 6px 10px;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-inline-end:8px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(4px);
+}
+
+/* keep clock visible and positioned when overlay opens on small screens */
+@media (max-width:1024px){
+    #clock{ display:flex }
+    nav.menu-open #clock{
+        position:fixed;
+        left:16px;
+        top:10px; /* near the header */
+        z-index:1255;
+        background: rgba(255,255,255,0.06);
+        color:#fff;
+    }
+}
 </style>
 </head>
 <body>
@@ -558,6 +586,9 @@ nav a.active{
 
         <!-- close button shown when overlay is open -->
         <button id="nav-close" aria-label="Close menu" title="Close menu">✕</button>
+
+        <!-- add this clock element -->
+        <div id="clock" aria-live="polite" title="Local time">--:--:--</div>
 
         <ul id="main-nav">
             <li><a href="#hero">Home</a></li>
@@ -1162,6 +1193,27 @@ nav a.active{
             window.addEventListener('beforeunload', ()=>{ document.documentElement.style.overflow = ''; document.body.style.overflow = ''; });
 
         })();
+
+        /* realtime clock (add near end of existing <script>) */
+(function(){
+    const clock = document.getElementById('clock');
+    if (!clock) return;
+    const pad = n => String(n).padStart(2,'0');
+
+    function updateClock(){
+        const d = new Date();
+        const hh = pad(d.getHours());
+        const mm = pad(d.getMinutes());
+        const ss = pad(d.getSeconds());
+        clock.textContent = `${hh}:${mm}:${ss}`;
+    }
+
+    updateClock();
+    const clockInterval = setInterval(updateClock, 1000);
+
+    // cleanup on unload
+    window.addEventListener('beforeunload', () => clearInterval(clockInterval));
+})();
     </script>
 
     <footer style="text-align: center; padding: 20px 0; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); margin-top: 50px;">
