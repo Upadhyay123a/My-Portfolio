@@ -498,6 +498,50 @@
     /* ensure the built-in nav-toggle is hidden behind overlay or reduced opacity */
     nav.menu-open #nav-toggle{ opacity:0.9; z-index:1240 }
 }
+
+/* Interactive additions (add near the end of the existing <style>) */
+
+/* typed cursor */
+.hero-content .subtitle .typed{ font-weight:700; display:inline-block }
+.typed-cursor{ display:inline-block; width:2px; height:1.05em; background:#fff; margin-left:8px; vertical-align:middle; animation:blink 900ms steps(1) infinite }
+@keyframes blink{ 50%{ opacity:0 } }
+
+/* counters (quick stats) */
+.counter{ font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight:800; }
+
+/* scroll-to-top button */
+#scrollTop{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    width:44px;
+    height:44px;
+    border-radius:10px;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background: linear-gradient(45deg,#667eea,#f5576c);
+    color:#fff;
+    border:0;
+    cursor:pointer;
+    z-index:1400;
+    box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+#scrollTop.show{ display:flex; opacity:1; transform:translateY(0); transition:all .18s ease; }
+#scrollTop.hide{ opacity:0; transform:translateY(10px); transition:all .18s ease; }
+
+/* active nav link style */
+nav a.active{
+    background: rgba(255,255,255,0.12);
+    color: #fff;
+    padding:.45rem .9rem;
+    border-radius:999px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* subtle tilt state for project cards */
+.project-card.tilt{ transition:transform .12s ease, box-shadow .12s ease; will-change:transform }
+.project-card.tilt:hover{ box-shadow:0 30px 60px rgba(0,0,0,0.12) }
 </style>
 </head>
 <body>
@@ -1018,6 +1062,105 @@
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && navbar.classList.contains('menu-open')) closeMenuLocal();
             });
+        })();
+
+        /* Interactive JS additions
+           (place inside the existing <script> after other handlers) */
+        (function(){
+            /* 1) Typed subtitle */
+            const subtitle = document.querySelector('.hero-content .subtitle');
+            if (subtitle) {
+                const words = ['Full Stack Java Developer','Backend & API specialist','Building scalable systems'];
+                const typedWrap = document.createElement('span');
+                typedWrap.className = 'typed-wrap';
+                typedWrap.innerHTML = '<span class="typed"></span><span class="typed-cursor"></span>';
+                subtitle.textContent = ''; subtitle.appendChild(typedWrap);
+                const typedEl = subtitle.querySelector('.typed');
+                let wi = 0, wiIndex = 0, forward = true;
+                function typeTick(){
+                    const word = words[wiIndex];
+                    if (forward) {
+                        wi++; typedEl.textContent = word.slice(0, wi);
+                        if (wi === word.length) { forward = false; setTimeout(typeTick, 900); return; }
+                    } else {
+                        wi--; typedEl.textContent = word.slice(0, wi);
+                        if (wi === 0) { forward = true; wiIndex = (wiIndex + 1) % words.length; setTimeout(typeTick, 200); return; }
+                    }
+                    setTimeout(typeTick, forward ? 90 : 36);
+                }
+                typeTick();
+            }
+
+            /* 2) Animated quick-stat counters (auto-detect simple numeric nodes) */
+            const numberNodes = Array.from(document.querySelectorAll('div,span')).filter(el=>{
+                const t = el.textContent.trim();
+                return (/^\d+\+?$/.test(t) && t.length <= 6);
+            });
+            const counterObserver = new IntersectionObserver((entries)=>{
+                entries.forEach(entry=>{
+                    if (!entry.isIntersecting) return;
+                    const el = entry.target;
+                    const raw = el.textContent.trim();
+                    const target = parseInt(raw.replace(/[^\d]/g,''), 10) || 0;
+                    let current = 0;
+                    const duration = 900;
+                    const tick = Math.max(1, Math.round(target / (duration / 16)));
+                    const id = setInterval(()=>{
+                        current += tick;
+                        if (current >= target) { el.textContent = (raw.endsWith('+') ? target + '+' : target); clearInterval(id); }
+                        else el.textContent = (raw.endsWith('+') ? current + '+' : current);
+                    }, 16);
+                    counterObserver.unobserve(el);
+                });
+            }, {threshold: 0.6});
+            numberNodes.forEach(n=>counterObserver.observe(n));
+
+            /* 3) Scroll-to-top button */
+            const scrollBtn = document.createElement('button');
+            scrollBtn.id = 'scrollTop';
+            scrollBtn.title = 'Back to top';
+            scrollBtn.innerHTML = '↑';
+            document.body.appendChild(scrollBtn);
+            function toggleScrollBtn(){
+                if (window.scrollY > 300) scrollBtn.classList.add('show'); else scrollBtn.classList.remove('show');
+            }
+            window.addEventListener('scroll', toggleScrollBtn);
+            scrollBtn.addEventListener('click', ()=> window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+            /* 4) Active nav-link on section intersect */
+            const sections = Array.from(document.querySelectorAll('section[id]'));
+            const navLinks = Array.from(document.querySelectorAll('#main-nav a[href^="#"]'));
+            if (sections.length && navLinks.length) {
+                const navObs = new IntersectionObserver((entries)=>{
+                    entries.forEach(entry=>{
+                        const id = entry.target.id;
+                        const link = navLinks.find(a => a.getAttribute('href') === '#' + id);
+                        if (!link) return;
+                        if (entry.isIntersecting) {
+                            navLinks.forEach(a => a.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    });
+                }, { threshold: 0.45 });
+                sections.forEach(s => navObs.observe(s));
+            }
+
+            /* 5) Project-card tilt effect */
+            document.querySelectorAll('.project-card').forEach(card=>{
+                card.addEventListener('mousemove', e=>{
+                    const rect = card.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    const rx = (y - 0.5) * -8; const ry = (x - 0.5) * 8;
+                    card.style.transform = `perspective(700px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.02)`;
+                    card.classList.add('tilt');
+                });
+                card.addEventListener('mouseleave', ()=>{ card.style.transform = ''; card.classList.remove('tilt'); });
+            });
+
+            /* 6) small accessibility: close overlay with focus on ESC already handled; ensure scroll lock removed on unload */
+            window.addEventListener('beforeunload', ()=>{ document.documentElement.style.overflow = ''; document.body.style.overflow = ''; });
+
         })();
     </script>
 
