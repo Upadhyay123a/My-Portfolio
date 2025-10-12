@@ -558,6 +558,29 @@ nav a.active{
     backdrop-filter: blur(4px);
 }
 
+/* Replace the existing small-screen clock rules with this to pin the clock to the top-left on <=1024px */
+@media (max-width:1024px){
+    /* show clock and pin to top-left of viewport */
+    #clock{
+        display:flex;
+        position:fixed;
+        left:12px;
+        top:10px;
+        z-index:1255;
+        background: rgba(255,255,255,0.06);
+        color:#fff;
+        padding:6px 10px;
+        border-radius:8px;
+        backdrop-filter: blur(4px);
+    }
+
+    /* when overlay opens keep clock above the overlay (adjust if needed) */
+    nav.menu-open #clock{
+        left:16px;
+        top:10px;
+        z-index:1300;
+    }
+}
 /* keep clock visible and positioned when overlay opens on small screens */
 @media (max-width:1024px){
     #clock{ display:flex }
